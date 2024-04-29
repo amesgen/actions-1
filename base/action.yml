@@ -17,7 +17,7 @@ runs:
       if: runner.os == 'macOS'
       shell: bash
       run: |
-        brew install pkg-config
+        brew install pkg-config openssl@3.0
 
         mkdir __prep__
         pushd __prep__
@@ -35,7 +35,7 @@ runs:
       shell: bash
       run: |
         echo "LD_LIBRARY_PATH=/usr/local/lib" >> $GITHUB_ENV
-        echo "PKG_CONFIG_PATH=/usr/local/opt/cardano/lib/pkgconfig:/usr/local/opt/openssl@1.1/lib/pkgconfig:/usr/local/opt/icu4c/lib/pkgconfig:$PKG_CONFIG_PATH" \
+        echo "PKG_CONFIG_PATH=/opt/homebrew/opt/openssl@3.0/lib/pkgconfig:/usr/local/opt/cardano/lib/pkgconfig:/usr/local/opt/openssl@1.1/lib/pkgconfig:/usr/local/opt/icu4c/lib/pkgconfig:$PKG_CONFIG_PATH" \
           >> $GITHUB_ENV
 
     # There are three pkg-config packages available for mingw, and each one has their problems:
@@ -60,7 +60,8 @@ runs:
         mv /c/Strawberry/perl/bin/pkg-config     /c/Strawberry/perl/bin/perl-pkg-config
         mv /c/Strawberry/perl/bin/pkg-config.bat /c/Strawberry/perl/bin/perl-pkg-config.bat
 
-        /usr/bin/pacman --noconfirm -S mingw-w64-x86_64-pkg-config mingw-w64-x86_64-openssl
+        /usr/bin/pacman --noconfirm -S mingw-w64-x86_64-pkg-config
+
         echo "PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1" >> $GITHUB_ENV
         echo "PKG_CONFIG_ALLOW_SYSTEM_LIBS=1"   >> $GITHUB_ENV
 
@@ -69,6 +70,8 @@ runs:
           curl -sL ${{ inputs.url-prefix }}/msys2.${{ inputs.use-sodium-vrf == 'true' && 'libsodium-vrf' || 'libsodium' }}.pkg.tar.zstd > libsodium.pkg.tar.zstd
           curl -sL ${{ inputs.url-prefix }}/msys2.libsecp256k1.pkg.tar.zstd > libsecp256k1.pkg.tar.zstd
           curl -sL ${{ inputs.url-prefix }}/msys2.libblst.pkg.tar.zstd      > libblst.pkg.tar.zstd
+          # OpenSSL .pc files are wrong in openssl-3.3.0 https://github.com/openssl/openssl/issues/24298
+          curl -sL https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-openssl-3.2.1-1-any.pkg.tar.zst > openssl.pkg.tar.zstd
           for pkg in *.zstd; do
             /usr/bin/pacman --noconfirm -U $pkg
           done
