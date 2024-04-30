@@ -21,9 +21,9 @@ runs:
 
         mkdir __prep__
         pushd __prep__
-          curl -sL ${{ inputs.url-prefix }}/macos.${{ inputs.use-sodium-vrf == 'true' && 'libsodium-vrf' || 'libsodium' }}.pkg > libsodium.pkg
-          curl -sL ${{ inputs.url-prefix }}/macos.libsecp256k1.pkg > libsecp256k1.pkg
-          curl -sL ${{ inputs.url-prefix }}/macos.libblst.pkg      > libblst.pkg
+          curl -sL ${{ inputs.url-prefix }}/$(uname -m)-macos.${{ inputs.use-sodium-vrf == 'true' && 'libsodium-vrf' || 'libsodium' }}.pkg > libsodium.pkg
+          curl -sL ${{ inputs.url-prefix }}/$(uname -m)-macos.libsecp256k1.pkg > libsecp256k1.pkg
+          curl -sL ${{ inputs.url-prefix }}/$(uname -m)-macos.libblst.pkg      > libblst.pkg
           for pkg in *.pkg; do
             sudo installer -pkg $pkg -target /
           done
