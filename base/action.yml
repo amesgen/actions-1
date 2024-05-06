@@ -69,6 +69,23 @@ runs:
         pushd __prep__
           curl -sL ${{ inputs.url-prefix }}/msys2.${{ inputs.use-sodium-vrf == 'true' && 'libsodium-vrf' || 'libsodium' }}.pkg.tar.zstd > libsodium.pkg.tar.zstd
           curl -sL ${{ inputs.url-prefix }}/msys2.libsecp256k1.pkg.tar.zstd > libsecp256k1.pkg.tar.zstd
+          # For windows we need to rely on the v2.2 libblst, otherwise GHC's linker blows up due to
+          # 
+          # GHC runtime linker: fatal error: I found a duplicate definition for symbol
+          #    __blst_platform_cap
+          # whilst processing object file
+          #    C:\msys64\mingw64\opt\cardano\lib\libblst.a
+          # The symbol was previously defined in
+          #    C:\msys64\mingw64\opt\cardano\lib\libblst.a(#2:server.o)
+          # This could be caused by:
+          #    * Loading two different object files which export the same symbol
+          #    * Specifying the same object file twice on the GHCi command line
+          #    * An incorrect `package.conf' entry, causing some object to be
+          #      loaded twice.
+          # ghc-9.8.1.exe: Could not load Object Code C:\msys64\mingw64\opt\cardano\lib\libblst.a(#1:assembly.o).
+          #
+          # While we have this fixed in our custom GHCs in haskell.nix, it's not fixed upstream, and we can't trivially
+          # fix the windows bindists. Thus for now we just use the older libblst on windows :see_no_evil:
           # curl -sL ${{ inputs.url-prefix }}/msys2.libblst.pkg.tar.zstd      > libblst.pkg.tar.zstd
           curl -sL  https://github.com/input-output-hk/iohk-nix/releases/download/v2.2/msys2.libblst.pkg.tar.zstd > libblst.pkg.tar.zstd
           # OpenSSL .pc files are wrong in openssl-3.3.0 https://github.com/openssl/openssl/issues/24298
