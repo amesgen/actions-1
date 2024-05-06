@@ -69,7 +69,8 @@ runs:
         pushd __prep__
           curl -sL ${{ inputs.url-prefix }}/msys2.${{ inputs.use-sodium-vrf == 'true' && 'libsodium-vrf' || 'libsodium' }}.pkg.tar.zstd > libsodium.pkg.tar.zstd
           curl -sL ${{ inputs.url-prefix }}/msys2.libsecp256k1.pkg.tar.zstd > libsecp256k1.pkg.tar.zstd
-          curl -sL ${{ inputs.url-prefix }}/msys2.libblst.pkg.tar.zstd      > libblst.pkg.tar.zstd
+          # curl -sL ${{ inputs.url-prefix }}/msys2.libblst.pkg.tar.zstd      > libblst.pkg.tar.zstd
+          curl -sL  https://github.com/input-output-hk/iohk-nix/releases/download/v2.2/msys2.libblst.pkg.tar.zstd > libblst.pkg.tar.zstd
           # OpenSSL .pc files are wrong in openssl-3.3.0 https://github.com/openssl/openssl/issues/24298
           curl -sL https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-openssl-3.2.1-1-any.pkg.tar.zst > openssl.pkg.tar.zstd
           for pkg in *.zstd; do
